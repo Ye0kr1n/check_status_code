@@ -2,7 +2,7 @@
 """
 @Time ： 2020/10/29 21:48
 @Auth ： Ye0kr1n
-@File ：check_status_code.py
+@File ：status_codes.py
 @IDE ：PyCharm
 @mail:1005406456@qq.con
 """
@@ -18,7 +18,7 @@ def read_xls(file):
     host=""
     for rowNum in range(table.nrows):
         if rowNum > 0:
-            if table.row_values(rowNum)[1].find('-')==-1:
+            if table.row_values(rowNum)[1].find('-')==-1:       #连续端口导入
                 dataFile.append(table.row_values(rowNum))
             else:
                 host=table.row_values(rowNum)[0]
@@ -28,21 +28,21 @@ def read_xls(file):
     return dataFile,len(dataFile)
 def get_title(url):
     res=requests.get(url).content
-    soup = BeautifulSoup(res,features="html.parser")
+    soup = BeautifulSoup(res,features="html.parser")    #使用BS4取网页标题
     title = soup.title.string
     return title
 
 def write_xls(data):
-    f = xlwt.Workbook(encoding='utf-8')
+    f = xlwt.Workbook(encoding='utf-8')     #进行文件的输出,创建sheet 创建表头,最后写入数据
     sheet1 = f.add_sheet('status_code')
     sheet1.write(0,0,"address")
     sheet1.write(0,1, "status")
     sheet1.write(0,2, "title")
     for i in range(0,len(data)):
-        sheet1.write(i+1, 0, data[i][0])
+        sheet1.write(i+1, 0, data[i][0])    #a[n][0]是ip地址,a[n][1]是响应码状态,a[n][2]是网页标题
         sheet1.write(i+1, 1, data[i][1])
         sheet1.write(i+1, 2, data[i][2])
-    f.save('write_status.xls')
+    f.save('write_status.xls')      #输出的文件名 write_status.xls
 def check_res_code(url):
     res=""
     u=url[0]
@@ -51,7 +51,7 @@ def check_res_code(url):
     urls="https://"+u+":"+p
     title=""
     try:
-        res=str(requests.get(url,timeout=3).status_code)
+        res=str(requests.get(url,timeout=3).status_code)    #此处做了http和https两种请求模式,取响应码
         title=get_title(url)
     except:
         try:
@@ -64,7 +64,7 @@ def check_res_code(url):
     return [urls,res,title]
 
 if __name__ == '__main__':
-    readlFile = '1.xlsx'
+    readlFile = '1.xlsx'  #读取的文件名
     url_list = read_xls(readlFile)[0]
     total=read_xls(readlFile)[1]
     a=[]
@@ -72,10 +72,11 @@ if __name__ == '__main__':
     for i in range(0,len(url_list),1):
         a.append(check_res_code(url_list[i]))
     #    print(check_res_code(url_list[i]))
-        print("[%s/%s]%s status code:%s"%(i+1,total,check_res_code(url_list[i])[0],check_res_code(url_list[i])[1]))
-    que=input("All over Output to xls?[Y/n]")
+        print("[%s/%s]%s   status code:%s    title:%s"%(i+1,total,check_res_code(url_list[i])[0],check_res_code(url_list[i])[1],check_res_code(url_list[i])[2]))
+    que=input("All over!!!Output to xls?[Y/n]")
     if que=='Y' or que=='':
-        write_xls(a)
         print("Generating XLS files now......")
+        write_xls(a)    #xls文件输出
+        print("Write OK!!!")
     else:
         exit()
