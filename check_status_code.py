@@ -4,7 +4,6 @@
 @Auth ： Ye0kr1n
 @File ：status_codes.py
 @IDE ：PyCharm
-@mail:1005406456@qq.con
 """
 import curl
 import xlrd
